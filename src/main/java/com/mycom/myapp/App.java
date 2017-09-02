@@ -9,7 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.scheduling.annotation.Scheduled;
 
 public class App {
-	@Scheduled(fixedRate = 1000)
+	@Scheduled(fixedRate = 1000 * 60)
 	public void main() {
 
 		String[] springConfig = { "spring/batch/jobs/job-hello-world.xml" };
