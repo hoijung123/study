@@ -2,8 +2,15 @@ package com.mycom.bitBatch;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
+import com.mycom.myapp.dao.TickerDAO;
+import com.mycom.myapp.vo.TickerStaticVO;
+
 
 public class Main {
+	@Inject
+	private TickerDAO tickerDAO;
 
 	public void main() throws InterruptedException, IOException {
 
@@ -30,6 +37,12 @@ public class Main {
 			}
 		}
 
+	}
+	
+	public void tranJob() {
+		TickerStaticVO vo = new TickerStaticVO();
+		tickerDAO.registerTickerStaticList(vo);
+		System.out.println("arrayCurrency[pos]");
 	}
 
 }

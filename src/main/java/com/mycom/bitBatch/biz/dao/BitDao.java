@@ -81,4 +81,51 @@ public class BitDao implements UserDao {
 		}
 	}
 	
+	
+	public boolean registerTickerStaticList() {
+		try {
+			
+			Connect();
+			String sql = "				INSERT INTO `bitsum`.`t_ticker_statics`\r\n" + 
+					"		(`currency`,\r\n" + 
+					"		`date_type`,\r\n" + 
+					"		`date`,\r\n" + 
+					"		`max_closing_price`,\r\n" + 
+					"		`min_closing_price`,\r\n" + 
+					"		`avg_closing_price`,\r\n" + 
+					"        `std_closing_price`,\r\n" + 
+					"		`cnt`,\r\n" + 
+					"		`std_avg_closing_price`)\r\n" + 
+					"		\r\n" + 
+					"		select t.currency,\r\n" + 
+					"		'A',\r\n" + 
+					"		t.date, t.max_closing_price, t.min_closing_price,\r\n" + 
+					"		t.avg_closing_price ,\r\n" + 
+					"		t.std_closing_price, cnt\r\n" + 
+					"		,(t.std_closing_price/t.avg_closing_price) *\r\n" + 
+					"		100 as\r\n" + 
+					"		std_avg_closing_price\r\n" + 
+					"		from (\r\n" + 
+					"		select currency, max(date) as date,\r\n" + 
+					"		max(closing_price) as max_closing_price, min(closing_price)\r\n" + 
+					"		as\r\n" + 
+					"		min_closing_price\r\n" + 
+					"		, avg(closing_price) as avg_closing_price,\r\n" + 
+					"		std(closing_price) as\r\n" + 
+					"		std_closing_price, count(1) as cnt from t_ticker\r\n" + 
+					"		group by currency) t";
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.executeUpdate();
+			
+			return true;
+			
+		} catch(Exception e) {
+			System.out.println(e);
+			return false;
+		} finally {
+			Disconnect();
+		}
+	}	
 }
