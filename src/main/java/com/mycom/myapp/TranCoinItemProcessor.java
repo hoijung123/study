@@ -70,7 +70,7 @@ public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 			System.out.println(sCurrency + " Price =============> " + price);
 
 			if ("N".equals(sBuyStatus)) {
-				if (new Integer(price).intValue() <= lBuyPrice) {
+				if (new Float(price).intValue() <= lBuyPrice) {
 					float krw_balance = tran.krw_balance().floatValue();
 					if (tran.krw_balance().floatValue() > lBuyUnits * 10) {
 						if ("Y".equals(sTranBuyYn)) {
@@ -101,7 +101,7 @@ public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 			System.out.println(sCurrency + " SellTargetPrice ==========================> " + lSellPrice);
 
 			if ("N".equals(sSellStatus)) {
-				if (new Integer(price).intValue() > lSellPrice) {
+				if (new Float(price).intValue() > lSellPrice) {
 					float currency_balance = tran.currency_balance(sCurrency).floatValue();
 					if (currency_balance > lSellUnits.floatValue()) {
 						if ("Y".equals(sTranSellYn)) {
