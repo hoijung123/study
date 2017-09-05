@@ -52,9 +52,11 @@
 	<select id="getTranConfigList" resultType="com.mycom.myapp.vo.TranConfigVO">
 		SELECT
 		`t_tran_config`.`currency`,
+		`t_tran_config`.`tran_type`,
 		`t_tran_config`.`target_price`,
 		`t_tran_config`.`status`,
-		`t_tran_config`.`tran_yn`
+		`t_tran_config`.`tran_yn`,
+		`t_tran_config`.`units`
 		FROM
 		`bitsum`.`t_tran_config`
 	</select>
