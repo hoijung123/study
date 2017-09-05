@@ -13,12 +13,6 @@
 		<property name="password" value="1111" />
 	</bean>
 
-	<!-- create job-meta tables automatically -->
-<!-- 	<jdbc:initialize-database data-source="dataSource"> -->
-<!-- 		<jdbc:script location="org/springframework/batch/core/schema-drop-mysql.sql" /> -->
-<!-- 		<jdbc:script location="org/springframework/batch/core/schema-mysql.sql" /> -->
-<!-- 	</jdbc:initialize-database> -->
-	
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource"></property>
@@ -35,7 +29,7 @@
 	<!-- sqlSession 을 SqlSessionTemplate으로 만든다. -->
 	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg index="0" ref="sqlSessionFactory" />
-	</bean>	
+	</bean>
 	
 	<jdbc:initialize-database data-source="dataSource" enabled="false">
 		<jdbc:script location="${batch.schema.script}" />

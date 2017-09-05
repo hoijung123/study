@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycom.myapp.dao.DbMapper">
+
+	<!-- /* select dual */ -->
+	<select id="getDual" resultType="java.lang.String">
+		select count(1) from t_ticker
+	</select>
+
+	<!-- /* select dual */ -->
+	<select id="getTickerList" resultType="com.mycom.myapp.vo.TickerVO">
+		SELECT currency,
+		date,
+		status,
+		opening_price,
+		closing_price,
+		min_price,
+		max_price,
+		average_price,
+		units_traded,
+		volume_1day,
+		volume_7day,
+		buy_price,
+		sell_price
+		FROM t_ticker
+		where (currency, date)
+		in (select currency , max(date) from t_ticker
+		group by currency)
+	</select>
+
+	<!-- /* get_ticker_static : 시세표준편자조회 */ -->
+	<select id="getTickerStaticList" resultType="com.mycom.myapp.vo.TickerStaticVO">
+		select t.currency,
+		t.date, t.max_closing_price, t.min_closing_price,
+		t.avg_closing_price ,
+		t.std_closing_price, cnt
+		,(t.std_closing_price/t.avg_closing_price) *
+		100 as
+		std_avg_closing_price
+		from (
+		select currency, max(date) as date,
+		max(closing_price) as max_closing_price, min(closing_price)
+		as
+		min_closing_price
+		, avg(closing_price) as avg_closing_price,
+		std(closing_price) as
+		std_closing_price, count(1) as cnt from t_ticker
+		group by currency) t
+	</select>
+
+	<!-- /* select dual */ -->
+	<select id="getTranConfigList" resultType="com.mycom.myapp.vo.TranConfigVO">
+		SELECT
+		`t_tran_config`.`currency`,
+		`t_tran_config`.`target_price`,
+		`t_tran_config`.`status`,
+		`t_tran_config`.`tran_yn`
+		FROM
+		`bitsum`.`t_tran_config`
+	</select>
+
+	<insert id="registerTickerStatic">
+		INSERT INTO `bitsum`.`t_ticker_statics`
+		(`currency`,
+		`date_type`,
+		`date`,
+		`max_closing_price`,
+		`min_closing_price`,
+		`avg_closing_price`,
+		`cnt`,
+		`std_avg_closing_price`)
+		VALUES
+		(#{currency},
+		#{date_type},
+		#{date},
+		#{max_closing_price},
+		#{min_closing_price},
+		#{avg_closing_price},
+		#{cnt},
+		#{std_avg_closing_price})
+	</insert>
+
+	<insert id="registerTickerStaticList">
+		INSERT INTO `bitsum`.`t_ticker_statics`
+		(`currency`,
+		`date_type`,
+		`date`,
+		`max_closing_price`,
+		`min_closing_price`,
+		`avg_closing_price`,
+		`std_closing_price`,
+		`cnt`,
+		`std_avg_closing_price`)
+
+		select t.currency,
+		'D',
+		t.date, t.max_closing_price, t.min_closing_price,
+		t.avg_closing_price ,
+		t.std_closing_price, cnt
+		,(t.std_closing_price/t.avg_closing_price) *
+		100 as
+		std_avg_closing_price
+		from (
+		select currency, max(date) as date,
+		max(closing_price) as max_closing_price, min(closing_price)
+		as
+		min_closing_price
+		, avg(closing_price) as avg_closing_price,
+		std(closing_price) as
+		std_closing_price, count(1) as cnt from t_ticker
+		group by currency) t
+	</insert>
+
+	<!-- /* select dual */ -->
+	<select id="getTranConfig" resultType="com.mycom.myapp.vo.TranConfigVO">
+		SELECT
+		`t_tran_config`.`currency`,
+		`t_tran_config`.`target_price`,
+		`t_tran_config`.`status`,
+		`t_tran_config`.`tran_yn`
+		,`t_tran_config`.`units`
+		FROM
+		`bitsum`.`t_tran_config`
+		WHERE currency = #{currency}
+		AND tran_type =
+		#{tran_type}
+	</select>
+
+	<update id="updateTranConfig">
+		UPDATE `bitsum`.`t_tran_config`
+		SET
+		`status` = #{status}
+		WHERE `currency` = #{currency} AND `tran_type` = #{tran_type}
+	</update>
+	
+	<update id="insertTranLog">
+		INSERT INTO `bitsum`.`t_tran_log`
+		(`order_id`,
+		`status`,
+		`cont_id`,
+		`units`,
+		`price`,
+		`total`,
+		`fee`,
+		`log_date`)
+		VALUES
+		(#{order_id},
+		#{status},
+		#{cont_id},
+		#{units},
+		#{price},
+		#{total},
+		#{fee})
+	</update>	
+
+</mapper>

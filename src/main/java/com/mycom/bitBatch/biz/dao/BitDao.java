@@ -1,59 +1,61 @@
 package com.mycom.bitBatch.biz.dao;
- 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
+import com.mycom.myapp.vo.TranConfigVO;
 
 public class BitDao implements UserDao {
 	Connection conn = null;
 	PreparedStatement pstmt = null;
-	
+
 	public void Connect() {
-		
+
 		String jdbc_driver = "com.mysql.cj.jdbc.Driver";
 		String jdbc_url = "jdbc:mysql://localhost:3306/bitsum?serverTimezone=UTC";
-		
+
 		try {
-			
+
 			Class.forName(jdbc_driver);
 			conn = DriverManager.getConnection(jdbc_url, "testuser", "1111");
-			
-		} catch(Exception e) {
-			
+
+		} catch (Exception e) {
+
 			System.out.println(e);
 		}
 	}
-	
+
 	public void Disconnect() {
 
-		if(pstmt != null) {
+		if (pstmt != null) {
 			try {
 				pstmt.close();
-			}catch(Exception e) {
+			} catch (Exception e) {
 				System.out.println(e);
 			}
 		}
-			
-		if(conn != null) {
-			
+
+		if (conn != null) {
+
 			try {
 				conn.close();
-			}catch(Exception e) {
+			} catch (Exception e) {
 				System.out.println(e);
 			}
 		}
 	}
-	
+
 	public boolean com_insert(ComEntity ce) {
 		try {
-			
+
 			Connect();
 			String sql = "INSERT INTO t_ticker(currency,date,status,opening_price,closing_price,min_price,max_price,average_price,units_traded,volume_1day,volume_7day,buy_price,sell_price)"
-                       + " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+					+ " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 			pstmt = conn.prepareStatement(sql);
-			
+
 			int i = 0;
 			pstmt.setString(++i, ce.getCurrency());
 			pstmt.setString(++i, ce.getDate());
@@ -70,10 +72,42 @@ public class BitDao implements UserDao {
 			pstmt.setLong(++i, ce.getSell_price());
 
 			pstmt.executeUpdate();
-			
+
 			return true;
-			
-		} catch(Exception e) {
+
+		} catch (Exception e) {
+			System.out.println(e);
+			return false;
+		} finally {
+			Disconnect();
+		}
+	}
+
+	public boolean registerTickerStaticList() {
+		try {
+
+			Connect();
+			String sql = "				INSERT INTO `bitsum`.`t_ticker_statics`\r\n" + "		(`currency`,\r\n"
+					+ "		`date_type`,\r\n" + "		`date`,\r\n" + "		`max_closing_price`,\r\n"
+					+ "		`min_closing_price`,\r\n" + "		`avg_closing_price`,\r\n"
+					+ "        `std_closing_price`,\r\n" + "		`cnt`,\r\n" + "		`std_avg_closing_price`)\r\n"
+					+ "		\r\n" + "		select t.currency,\r\n" + "		'A',\r\n"
+					+ "		t.date, t.max_closing_price, t.min_closing_price,\r\n" + "		t.avg_closing_price ,\r\n"
+					+ "		t.std_closing_price, cnt\r\n" + "		,(t.std_closing_price/t.avg_closing_price) *\r\n"
+					+ "		100 as\r\n" + "		std_avg_closing_price\r\n" + "		from (\r\n"
+					+ "		select currency, max(date) as date,\r\n"
+					+ "		max(closing_price) as max_closing_price, min(closing_price)\r\n" + "		as\r\n"
+					+ "		min_closing_price\r\n" + "		, avg(closing_price) as avg_closing_price,\r\n"
+					+ "		std(closing_price) as\r\n" + "		std_closing_price, count(1) as cnt from t_ticker\r\n"
+					+ "		group by currency) t";
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.executeUpdate();
+
+			return true;
+
+		} catch (Exception e) {
 			System.out.println(e);
 			return false;
 		} finally {
@@ -81,47 +115,27 @@ public class BitDao implements UserDao {
 		}
 	}
 	
-	
-	public boolean registerTickerStaticList() {
+	public boolean updateTranConfig(String currency, String status, String tran_type) {
 		try {
-			
+
 			Connect();
-			String sql = "				INSERT INTO `bitsum`.`t_ticker_statics`\r\n" + 
-					"		(`currency`,\r\n" + 
-					"		`date_type`,\r\n" + 
-					"		`date`,\r\n" + 
-					"		`max_closing_price`,\r\n" + 
-					"		`min_closing_price`,\r\n" + 
-					"		`avg_closing_price`,\r\n" + 
-					"        `std_closing_price`,\r\n" + 
-					"		`cnt`,\r\n" + 
-					"		`std_avg_closing_price`)\r\n" + 
-					"		\r\n" + 
-					"		select t.currency,\r\n" + 
-					"		'A',\r\n" + 
-					"		t.date, t.max_closing_price, t.min_closing_price,\r\n" + 
-					"		t.avg_closing_price ,\r\n" + 
-					"		t.std_closing_price, cnt\r\n" + 
-					"		,(t.std_closing_price/t.avg_closing_price) *\r\n" + 
-					"		100 as\r\n" + 
-					"		std_avg_closing_price\r\n" + 
-					"		from (\r\n" + 
-					"		select currency, max(date) as date,\r\n" + 
-					"		max(closing_price) as max_closing_price, min(closing_price)\r\n" + 
-					"		as\r\n" + 
-					"		min_closing_price\r\n" + 
-					"		, avg(closing_price) as avg_closing_price,\r\n" + 
-					"		std(closing_price) as\r\n" + 
-					"		std_closing_price, count(1) as cnt from t_ticker\r\n" + 
-					"		group by currency) t";
+			String sql = "UPDATE `bitsum`.`t_tran_config`\r\n" + 
+					"SET\r\n" + 
+					"`status` = '" + status + "' \r\n" + 
+					"WHERE `currency` = '" + currency + "' AND `tran_type` = '" + tran_type + "' \r\n" + 
+					"";
 
 			pstmt = conn.prepareStatement(sql);
+			int i = 0;
+//			pstmt.setString(++i, status);
+//			pstmt.setString(++i, currency);
+//			pstmt.setString(++i, tran_type);
 
 			pstmt.executeUpdate();
-			
+
 			return true;
-			
-		} catch(Exception e) {
+
+		} catch (Exception e) {
 			System.out.println(e);
 			return false;
 		} finally {

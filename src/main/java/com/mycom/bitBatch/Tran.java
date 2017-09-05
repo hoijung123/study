@@ -6,34 +6,68 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.inject.Inject;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.mycom.bitBatch.biz.dao.BitDao;
 import com.mycom.bitBatch.biz.dao.ComEntity;
+import com.mycom.myapp.dao.TranConfigDAO;
+import com.mycom.myapp.vo.TranConfigVO;
 
 
 public class Tran {
-	;
-	String CURRENCY = "LTC";
-	String currency = "ltc";
-
+	@Inject
+	private TranConfigDAO tranConfigDAO;
+	
 	public void market_buy(String currency, float cnt, String price) throws ParseException, IOException {
-		// https://api.bithumb.com/trade/market_buy
+//		{
+//		    "status"    : "0000",
+//		    "order_id"  : "1429500241523",
+//		    "data": [
+//		        {
+//		            "cont_id"   : "15364",
+//		            "units"     : "0.16789964",
+//		            "price"     : "270000",
+//		            "total"     : 45333,
+//		            "fee"       : "0.00016790"
+//		        },
+//		        {
+//		            "cont_id"   : "15365",
+//		            "units"     : "0.08210036",
+//		            "price"     : "289000",
+//		            "total"     : 23727,
+//		            "fee"       : "0.00008210"
+//		        }
+//		    ]
+//		}
+//		[Returned Value Description]
+//				Key Name	Description
+//				status	결과 상태 코드 (정상 : 0000, 정상이외 코드는 에러 코드 참조)
+//				order_id	주문 번호
+//				cont_id	체결 번호
+//				units	총 구매 수량(수수료 포함)
+//				price	1Currency당 KRW 시세 (BTC, ETH, DASH, LTC, ETC, XRP, BCH, XMR)
+//				total	구매 KRW
+//				fee	구매 수수료		
+		
+		// [Request Parameters]
+		// Parameter Name Data Type Description
 		// apiKey String apiKey
 		// secretKey String scretKey
-		// units Float 占쌍뱄옙 占쏙옙占쏙옙
+		// units Float 주문 수량
 		//
-		// - 1회 占쌍쇽옙 占쏙옙占쏙옙 (BTC: 0.001 | ETH: 0.01 | DASH: 0.01 | LTC: 0.1 | ETC: 0.1
-		// | XRP: 10 | BCH: 0.01)
-		// - 1회 占신뤄옙 占싼듸옙 : 1占쏙옙占�
-		// currency String BTC, ETH, DASH, LTC, ETC, XRP, BCH (占썩본占쏙옙: BTC)
+		// - 1회 최소 수량 (BTC: 0.001 | ETH: 0.01 | DASH: 0.01 | LTC: 0.1 | ETC: 0.1 | XRP:
+		// 10 | BCH: 0.01 | XMR: 0.01)
+		// - 1회 거래 한도 : 1억원
+		// currency String BTC, ETH, DASH, LTC, ETC, XRP, BCH, XMR (기본값: BTC)		
 
-		Api_Client api = new Api_Client("53dab0b00ba17b0cc13028ce72c50e60", "3ca67fe7cb97c75444b94befa810ee1b");
+		Api_Client api = new Api_Client(Constants.API_KEY, Constants.SECRET_KEY);
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
-		rgParams.put("currency", CURRENCY);
+		rgParams.put("currency", currency);
 		rgParams.put("payment_currency", "KRW");
 		Float fCnt = (float) Math.floor(cnt);
 		rgParams.put("units", fCnt.toString());
@@ -60,10 +94,10 @@ public class Tran {
 		// - 1회 占신뤄옙 占싼듸옙 : 1占쏙옙占�
 		// currency String BTC, ETH, DASH, LTC, ETC, XRP, BCH (占썩본占쏙옙: BTC)
 
-		Api_Client api = new Api_Client("53dab0b00ba17b0cc13028ce72c50e60", "3ca67fe7cb97c75444b94befa810ee1b");
+		Api_Client api = new Api_Client(Constants.API_KEY, Constants.SECRET_KEY);
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
-		rgParams.put("currency", CURRENCY);
+		rgParams.put("currency", currency);
 		rgParams.put("payment_currency", "KRW");
 		Float fCnt = (float) Math.floor(cnt);
 		rgParams.put("units", fCnt.toString());
@@ -75,8 +109,8 @@ public class Tran {
 
 		System.out.println(jsonObj);
 
-		System.out.println("Sell Cnt ===> " + fCnt.toString());
-		System.out.println("Sell Price ===> " + price);
+		//System.out.println("Sell Cnt ===> " + fCnt.toString());
+		//System.out.println("Sell Price ===> " + price);
 	}
 
 	public Long krw_balance() throws ParseException, IOException {
@@ -95,13 +129,14 @@ public class Tran {
 
 		Long ret = new Long(0);
 
-		Api_Client api = new Api_Client("53dab0b00ba17b0cc13028ce72c50e60", "3ca67fe7cb97c75444b94befa810ee1b");
+		Api_Client api = new Api_Client(Constants.API_KEY, Constants.SECRET_KEY);
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
-		rgParams.put("currency", CURRENCY);
+		rgParams.put("currency", "LTC");
 		rgParams.put("payment_currency", "KRW");
 
 		String result = api.callApi("/info/balance", rgParams);
+		System.out.println("result===> " + result);
 		JSONParser jsonParser = new JSONParser();
 		JSONObject jsonObj = (JSONObject) jsonParser.parse(result);
 
@@ -112,7 +147,7 @@ public class Tran {
 		return available_krw;
 	}
 
-	public Float xrp_balance() throws ParseException, IOException {
+	public Float currency_balance(String sCurrency) throws ParseException, IOException {
 		// status 占쏙옙占� 占쏙옙占쏙옙 占쌘듸옙 (占쏙옙占쏙옙 : 0000, 占쏙옙占쏙옙占싱울옙 占쌘듸옙占� 占쏙옙占쏙옙 占쌘듸옙 占쏙옙占쏙옙)
 		// total_{currency} 占쏙옙체 Currency (btc, eth, dash, ltc, etc, xrp, bch)
 		// total_krw 占쏙옙체 KRW
@@ -128,10 +163,10 @@ public class Tran {
 
 		Long ret = new Long(0);
 
-		Api_Client api = new Api_Client("53dab0b00ba17b0cc13028ce72c50e60", "3ca67fe7cb97c75444b94befa810ee1b");
+		Api_Client api = new Api_Client(Constants.API_KEY, Constants.SECRET_KEY);
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
-		rgParams.put("currency", CURRENCY);
+		rgParams.put("currency", sCurrency);
 		rgParams.put("payment_currency", "KRW");
 
 		String result = api.callApi("/info/balance", rgParams);
@@ -140,9 +175,9 @@ public class Tran {
 
 		JSONObject jsonObj2 = (JSONObject) jsonObj.get("data");
 
-		Float available_xrp = new Float((String) jsonObj2.get("available_" + currency));
+		Float available_currency = new Float((String) jsonObj2.get("available_" + sCurrency.toLowerCase()));
 
-		return available_xrp;
+		return available_currency;
 
 	}
 
@@ -228,7 +263,7 @@ public class Tran {
 
 		Long ret = new Long(0);
 
-		Api_Client api = new Api_Client("53dab0b00ba17b0cc13028ce72c50e60", "3ca67fe7cb97c75444b94befa810ee1b");
+		Api_Client api = new Api_Client(Constants.API_KEY, Constants.SECRET_KEY);
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
 		rgParams.put("currency", pCurrency);
@@ -268,4 +303,5 @@ public class Tran {
 			tickerOut = tran.get_ticker(pCurrency);
 			bitDao.com_insert(tickerOut);
 	}
+	
 }
