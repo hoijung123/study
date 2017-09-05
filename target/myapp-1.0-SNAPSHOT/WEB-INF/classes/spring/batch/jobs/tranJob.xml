@@ -29,5 +29,20 @@
 
 		</batch:step>
 	</batch:job>
+	
+	<bean id="tranCoinItemProcessor" class="com.mycom.myapp.TranCoinItemProcessor" />
+
+	<batch:job id="tranCoinJob">
+		<batch:step id="tranCoinStep1">
+
+			<batch:tasklet transaction-manager="transactionManager">
+
+				<batch:chunk reader="reader" processor="tranCoinItemProcessor"
+					writer="writer" commit-interval="1" />
+
+			</batch:tasklet>
+
+		</batch:step>
+	</batch:job>	
 
 </beans>

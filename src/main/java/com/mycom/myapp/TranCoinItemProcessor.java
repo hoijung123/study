@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 
+import com.kiss.util.SendMail;
 import com.mycom.bitBatch.Api_Client;
 import com.mycom.bitBatch.Tran;
 import com.mycom.myapp.dao.TranConfigDAO;
@@ -29,6 +30,7 @@ public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 	}
 
 	public String tranCoin(String sCurrency) {
+		SendMail sendMail = new SendMail();
 		Api_Client api = new Api_Client("53dab0b00ba17b0cc13028ce72c50e60", "3ca67fe7cb97c75444b94befa810ee1b");
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
@@ -87,6 +89,7 @@ public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 							vo.setStatus("N");
 							vo.setTran_type("S");
 							tranConfigDAO.updateTranConfig(vo);
+							sendMail.sendMail(sCurrency + "/" + " Buy " + "/" + " Unit:" + lBuyUnits + "/" + " Price:" + price);
 						} else {
 							System.out.println("Tran is Not Setting");
 						}
@@ -118,6 +121,8 @@ public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 							vo.setStatus("N");
 							vo.setTran_type("B");
 							tranConfigDAO.updateTranConfig(vo);
+							
+							sendMail.sendMail(sCurrency + "/" + " Sell " + "/" + " Unit:" + lBuyUnits + "/" + " Price:" + price);
 						} else {
 							System.out.println("Tran is Not Setting");
 						}
