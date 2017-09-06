@@ -28,3 +28,11 @@
 <a href="tickerStaticList">tickerStaticList</a><br>
 <a href="tranConfigList">tranConfigList</a>
 </body>
+
+<script langauge="javascript">
+var counter = 0;
+window.setInterval("refreshDiv()", 5000);
+function refreshDiv(){
+	location.reload();
+}
+</script>

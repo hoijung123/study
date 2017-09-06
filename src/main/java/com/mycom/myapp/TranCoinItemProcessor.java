@@ -20,7 +20,7 @@ import com.mycom.myapp.vo.TranConfigVO;
 public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 
 	private static final Logger logger = LoggerFactory.getLogger(TranCoinItemProcessor.class);
-	private static final int SLEEP_TIME = 200;
+	private static final int SLEEP_TIME = 2000;
 
 	@Inject
 	private TranConfigDAO tranConfigDAO;

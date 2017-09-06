@@ -96,7 +96,8 @@
 
 		select t.currency,
 		'D',
-		t.date, t.max_closing_price, t.min_closing_price,
+		t.date,
+		t.max_closing_price, t.min_closing_price,
 		t.avg_closing_price ,
 		t.std_closing_price, cnt
 		,(t.std_closing_price/t.avg_closing_price) *
@@ -123,7 +124,8 @@
 		,`t_tran_config`.`units`
 		FROM
 		`bitsum`.`t_tran_config`
-		WHERE currency = #{currency}
+		WHERE currency =
+		#{currency}
 		AND tran_type =
 		#{tran_type}
 	</select>
@@ -131,10 +133,17 @@
 	<update id="updateTranConfig">
 		UPDATE `bitsum`.`t_tran_config`
 		SET
-		`status` = #{status}
-		WHERE `currency` = #{currency} AND `tran_type` = #{tran_type}
+		<if test="tran_yn != null">
+			tran_yn = #{tran_yn},
+		</if>
+		<if test="status != null">
+			status = #{status},
+		</if>
+		currency = #{currency}
+		WHERE `currency` = #{currency} AND `tran_type` =
+		#{tran_type}
 	</update>
-	
+
 	<update id="insertTranLog">
 		INSERT INTO `bitsum`.`t_tran_log`
 		(`order_id`,
@@ -153,6 +162,6 @@
 		#{price},
 		#{total},
 		#{fee})
-	</update>	
+	</update>
 
 </mapper>

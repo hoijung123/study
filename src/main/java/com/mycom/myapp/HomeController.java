@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -16,10 +17,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mycom.myapp.dao.TickerDAO;
 import com.mycom.myapp.dao.TranConfigDAO;
 import com.mycom.myapp.service.DbService;
+import com.mycom.myapp.vo.TranConfigVO;
 
 /**
  * Handles requests for the application home page.
@@ -67,10 +70,10 @@ public class HomeController {
 		return "test";
 	}
 
-	// <--- Ãß°¡
+	// <--- ï¿½ß°ï¿½
 	@Autowired
 	private SqlSession sqlSession;
-	// Ãß°¡ --->
+	// ï¿½ß°ï¿½ --->
 
 	/**
 	 * Simply selects the home view to render by returning its name.
@@ -86,13 +89,13 @@ public class HomeController {
 
 		model.addAttribute("serverTime", formattedDate);
 
-		// <--- Ãß°¡
+		// <--- ï¿½ß°ï¿½
 		HashMap<String, String> input = new HashMap<String, String>();
 		input.put("name", "han");
 		List<HashMap<String, String>> outputs = sqlSession.selectList("userControlMapper.selectSample", input);
 		System.out.println(outputs.toString());
 		model.addAttribute("list", outputs.toString());
-		// Ãß°¡ --->
+		// ï¿½ß°ï¿½ --->
 
 		return "list";
 	}
@@ -104,9 +107,9 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/tickerList", method = RequestMethod.GET)
 	public String tickerList(Model model) throws Exception {
-		// <--- Ãß°¡
+		// <--- ï¿½ß°ï¿½
 		model.addAttribute("tickerList", tickerDAO.getTickerList());
-		// Ãß°¡ --->
+		// ï¿½ß°ï¿½ --->
 
 		return "ticker/tickerList";
 	}
@@ -118,9 +121,9 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/tickerStaticList", method = RequestMethod.GET)
 	public String tickerStaticList(Model model) throws Exception {
-		// <--- Ãß°¡
+		// <--- ï¿½ß°ï¿½
 		model.addAttribute("tickerStaticList", tickerDAO.getTickerStaticList());
-		// Ãß°¡ --->
+		// ï¿½ß°ï¿½ --->
 
 		return "ticker/tickerStaticList";
 	}
@@ -132,11 +135,32 @@ public class HomeController {
 	 */
 	@RequestMapping(value = "/tranConfigList", method = RequestMethod.GET)
 	public String tranConfigList(Model model) throws Exception {
-		// <--- Ãß°¡
+		// <--- ï¿½ß°ï¿½
 		model.addAttribute("tranConfigList", tranConfigDAO.getTranConfigList());
-		// Ãß°¡ --->
+		// ï¿½ß°ï¿½ --->
 
 		return "tranConfig/tranConfigList";
 	}	
+	
+	/**
+	 * Simply selects the home view to render by returning its name.
+	 * 
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/tranConfigSave", method = RequestMethod.POST)
+	public String tranConfigSave(@RequestParam Map<String, String> params, Model model) throws Exception {
+		TranConfigVO tranConfigVO = new TranConfigVO();
+		tranConfigVO.setCurrency(params.get("currency"));
+		tranConfigVO.setTran_yn(params.get("tran_yn"));
+		tranConfigVO.setTran_type(params.get("tran_type"));
+		tranConfigVO.setStatus(params.get("status"));
+		
+		tranConfigDAO.updateTranConfig(tranConfigVO);
+		
+		model.addAttribute("tranConfigList", tranConfigDAO.getTranConfigList());
+
+		return "tranConfig/tranConfigList";
+	}		
+	
 
 }

@@ -166,12 +166,15 @@ public class Tran {
 		Api_Client api = new Api_Client(Constants.API_KEY, Constants.SECRET_KEY);
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
-		rgParams.put("currency", sCurrency);
+		rgParams.put("currency", sCurrency.toLowerCase());
 		rgParams.put("payment_currency", "KRW");
 
 		String result = api.callApi("/info/balance", rgParams);
 		JSONParser jsonParser = new JSONParser();
 		JSONObject jsonObj = (JSONObject) jsonParser.parse(result);
+		
+		System.out.println("currency_balance====> " + result);
+		
 
 		JSONObject jsonObj2 = (JSONObject) jsonObj.get("data");
 
