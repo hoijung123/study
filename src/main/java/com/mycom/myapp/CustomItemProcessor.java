@@ -10,7 +10,7 @@ public class CustomItemProcessor implements ItemProcessor<String, String> {
 	public String process(String item) throws Exception {
 		Main main = new Main();
 		main.main();
-		System.out.println("Processing.." + item);
+		System.out.println("Processing...." + item);
 		return item;
 	}
 
