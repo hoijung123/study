@@ -1,80 +1,49 @@
 package com.kiss.util;
-
-import java.util.Date;
-import java.util.Properties;
- 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.internet.AddressException;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
 public class SendMail {
-	 
-    public void sendMail(String sContent) {
-         
-        Properties p = System.getProperties();
-        p.put("mail.smtp.starttls.enable", "true");     // gmail
-        p.put("mail.smtp.host", "smtp.naver.com");      // smtp 
-        p.put("mail.smtp.auth","true");                 // gmail
-        p.put("mail.smtp.port", "587");                 // gmail 
-           
-        Authenticator auth = new MyAuthentication();
-         
-        Session session = Session.getDefaultInstance(p, auth);
-        MimeMessage msg = new MimeMessage(session);
-         
-        try{
-            msg.setSentDate(new Date());
-             
-            InternetAddress from = new InternetAddress() ;
-             
-             
-            from = new InternetAddress("kinobebe@naver.com");
-             
-            msg.setFrom(from);
-             
-             
-            InternetAddress to = new InternetAddress("kinobebe@naver.com");
-            msg.setRecipient(Message.RecipientType.TO, to);
-             
-            msg.setSubject("���� ���� �׽�Ʈ", "UTF-8");
-             
-            msg.setText("����", "UTF-8");
-             
-            msg.setHeader("content-Type", "text/html");
-             
-            javax.mail.Transport.send(msg);
-             
-        }catch (AddressException addr_e) {
-            addr_e.printStackTrace();
-        }catch (MessagingException msg_e) {
-            msg_e.printStackTrace();
-        }
-    }
- 
-}
- 
- 
-class MyAuthentication extends Authenticator {
-      
-    PasswordAuthentication pa;
-    
- 
-    public MyAuthentication(){
-         
-        String id = "kinobebe@naver.com";      
-        String pw = "!nana1379";          
- 
-        pa = new PasswordAuthentication(id, pw);
-      
-    }
- 
-    public PasswordAuthentication getPasswordAuthentication() {
-        return pa;
-    }
-}
+	
+	public void sendMail(String sTitle, String sContents) {
+		final String username = "kinobebe1974";
+		final String password = "kiss2350";
 
+
+		Properties props = new Properties();
+		props.put("mail.smtp.user", username);
+		props.put("mail.smtp.password", password);
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.port", "25");
+		props.put("mail.debug", "true");
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.EnableSSL.enable", "true");
+		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		props.setProperty("mail.smtp.socketFactory.fallback", "false");
+		props.setProperty("mail.smtp.port", "465");
+		props.setProperty("mail.smtp.socketFactory.port", "465");
+
+		Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, password);
+			}
+		});
+		System.out.println("??");
+		try {
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress("kinobebe1974@gmail.com"));//
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("kinobebe@naver.com"));
+			message.setSubject(sTitle);
+			message.setText(sContents);
+			// message.setContent("����","text/html; charset=utf-8");
+			System.out.println("send!!!");
+			Transport.send(message);
+			System.out.println("SEND");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

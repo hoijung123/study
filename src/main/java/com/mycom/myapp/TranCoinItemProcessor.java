@@ -12,6 +12,7 @@ import org.springframework.batch.item.ItemProcessor;
 
 import com.kiss.util.SendMail;
 import com.mycom.bitBatch.Api_Client;
+import com.mycom.bitBatch.Constants;
 import com.mycom.bitBatch.Tran;
 import com.mycom.myapp.dao.TranConfigDAO;
 import com.mycom.myapp.vo.TranConfigVO;
@@ -19,19 +20,24 @@ import com.mycom.myapp.vo.TranConfigVO;
 public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 
 	private static final Logger logger = LoggerFactory.getLogger(TranCoinItemProcessor.class);
+	private static final int SLEEP_TIME = 200;
 
 	@Inject
 	private TranConfigDAO tranConfigDAO;
 
 	@Override
 	public String process(String item) throws Exception {
-		this.tranCoin("XRP");
+		this.tranCoin(Constants.CURRENCY_XRP);
+		Thread.sleep(SLEEP_TIME);
+		this.tranCoin(Constants.CURRENCY_LTC);
+		Thread.sleep(SLEEP_TIME);
+		this.tranCoin(Constants.CURRENCY_ETH);
 		return item;
 	}
 
 	public String tranCoin(String sCurrency) {
 		SendMail sendMail = new SendMail();
-		Api_Client api = new Api_Client("53dab0b00ba17b0cc13028ce72c50e60", "3ca67fe7cb97c75444b94befa810ee1b");
+		Api_Client api = new Api_Client(Constants.API_KEY, Constants.SECRET_KEY);
 
 		HashMap<String, String> rgParams = new HashMap<String, String>();
 		rgParams.put("order_currency", sCurrency);
@@ -89,7 +95,7 @@ public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 							vo.setStatus("N");
 							vo.setTran_type("S");
 							tranConfigDAO.updateTranConfig(vo);
-							sendMail.sendMail(sCurrency + "/" + " Buy " + "/" + " Unit:" + lBuyUnits + "/" + " Price:" + price);
+							sendMail.sendMail("Bitsum Buy", sCurrency + "/" + " Buy " + "/" + " Unit:" + lBuyUnits + "/" + " Price:" + price);
 						} else {
 							System.out.println("Tran is Not Setting");
 						}
@@ -122,7 +128,7 @@ public class TranCoinItemProcessor implements ItemProcessor<String, String> {
 							vo.setTran_type("B");
 							tranConfigDAO.updateTranConfig(vo);
 							
-							sendMail.sendMail(sCurrency + "/" + " Sell " + "/" + " Unit:" + lBuyUnits + "/" + " Price:" + price);
+							sendMail.sendMail("Bitsum Sell", sCurrency + "/" + " Sell " + "/" + " Unit:" + lBuyUnits + "/" + " Price:" + price);
 						} else {
 							System.out.println("Tran is Not Setting");
 						}

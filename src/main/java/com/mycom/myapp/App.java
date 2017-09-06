@@ -74,7 +74,7 @@ public class App {
 		System.out.println("tranJob Done");
 	}	
 	
-	@Scheduled(fixedRate = 1000 * 10)
+	@Scheduled(fixedRate = 1000 * 5)
 	public void tranCoinJob() throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException, JobParametersInvalidException {
 
 		String[] springConfig = { "spring/batch/jobs/tranJob.xml" };
