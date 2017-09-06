@@ -139,6 +139,12 @@
 		<if test="status != null">
 			status = #{status},
 		</if>
+		<if test="target_price != null">
+			target_price = #{target_price},
+		</if>
+		<if test="units != null">
+			units = #{units},
+		</if>
 		currency = #{currency}
 		WHERE `currency` = #{currency} AND `tran_type` =
 		#{tran_type}

@@ -154,6 +154,8 @@ public class HomeController {
 		tranConfigVO.setTran_yn(params.get("tran_yn"));
 		tranConfigVO.setTran_type(params.get("tran_type"));
 		tranConfigVO.setStatus(params.get("status"));
+		tranConfigVO.setTarget_price(new Float(params.get("target_price")));
+		tranConfigVO.setUnits(new Float(params.get("target_price")));
 		
 		tranConfigDAO.updateTranConfig(tranConfigVO);
 		
